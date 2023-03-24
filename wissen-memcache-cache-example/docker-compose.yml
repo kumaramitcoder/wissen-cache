@@ -1,0 +1,65 @@
+volumes:
+  memcached_1_data: {}
+  memcached_2_data: {}
+  memcached_3_data: {}
+  
+services:
+  # Here we have two memcached containers & one spring application
+  memcached_1:
+    image: 'memcached:latest'
+    container_name: memcached_1
+    ports:
+      - "11211"
+    volumes:
+      - memcached_1_data:/data
+    networks:
+      cluster_net:
+        ipv4_address: 10.1.50.51
+
+  memcached_2:
+    image: 'memcached:latest'
+    container_name: memcached_2
+    ports:
+      - "11211"
+    volumes:
+      - memcached_2_data:/data
+    networks:
+      cluster_net:
+        ipv4_address: 10.1.50.52
+  
+  memcached_3:
+    image: 'memcached:latest'
+    container_name: memcached_3
+    ports:
+      - "11211"
+    volumes:
+      - memcached_3_data:/data
+    networks:
+      cluster_net:
+        ipv4_address: 10.1.50.53
+        
+  # Spring going to connect for redis cluster environment & performs cache operations
+  spring_memcached_app:
+    container_name: spring_memcached_app
+    ports:
+      - "5050:5050"
+    build:
+      dockerfile: Dockerfile
+    tty: true
+    depends_on:
+      - memcached_1
+      - memcached_2
+      - memcached_3
+    networks:
+      cluster_net:
+        ipv4_address: 10.1.50.54
+
+# Rename the default network so we can easily identify it
+# Across all containers
+networks:
+  cluster_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.1.50.0/24

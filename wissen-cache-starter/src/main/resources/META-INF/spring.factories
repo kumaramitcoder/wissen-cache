@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.wissen.accelerators.cache.auto.configuration.WissenCacheAutoConfiguration,\
+com.wissen.accelerators.cache.auto.configuration.redis.RedisCachingConfig
